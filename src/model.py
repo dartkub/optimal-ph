@@ -315,30 +315,36 @@ class TreeDecisionOnCharged:
         with open(self.model_file_path, 'rb') as model_file:
             model: tree.DecisionTreeRegressor = pickle.load(model_file)
 
-        ls_charged_3grams = [p for p in product(sorted(set(aa2charges.values())), repeat=3)]
-        charged_positions = {g:i for i, g in enumerate(ls_charged_3grams)}
+        #ls_charged_3grams = [p for p in product(sorted(set(aa2charges.values())), repeat=3)]
+        #charged_positions = {g:i for i, g in enumerate(ls_charged_3grams)}
 
-        df_test['charged_sequence'] = df_test['sequence'].apply(lambda seq: [aa2charges[i] for i in seq])
-        df_test['charged_3_grams'] = df_test['charged_sequence'].apply(get_n_grams)
-        df_test['charged_freqs'] = df_test['charged_3_grams'].apply(lambda x: get_frequencies(x, pos_dict=charged_positions))
-        df_test['charged_count'] = df_test['sequence'].apply(count_charged_amino_acids)
+        #df_test['charged_sequence'] = df_test['sequence'].apply(lambda seq: [aa2charges[i] for i in seq])
+        #df_test['charged_3_grams'] = df_test['charged_sequence'].apply(get_n_grams)
+        #df_test['charged_freqs'] = df_test['charged_3_grams'].apply(lambda x: get_frequencies(x, pos_dict=charged_positions))
+        #df_test['charged_count'] = df_test['sequence'].apply(count_charged_amino_acids)
 
 
-        df_test['aspF'] = df_test['sequence'].apply(aspDistSeq)
+        #df_test['aspF'] = df_test['sequence'].apply(aspDistSeq)
 
         calculate_features(df_test)
 
         # HERE SHOULD BE CONCATENATION CODE
+        n_seq = df_test.shape[0]
+        n_features = 14
+        X = np.zeros(shape=(n_seq, n_features))
+        for i in range(n_seq):
+            fn = os.path.join("./features", "seq"+str(i+1)+".npy")
+            data = np.load(fn)
+            X[i][:] = data[:n_features]
 
 
+        #X_freq = df_test['charged_freqs']
+        #X_freq = np.array([row for row in X_freq])
 
-        X_freq = df_test['charged_freqs']
-        X_freq = np.array([row for row in X_freq])
-
-        X_counts = df_test['charged_count'].values
-        X_counts = np.array([row for row in X_counts])
+        #X_counts = df_test['charged_count'].values
+        #X_counts = np.array([row for row in X_counts])
         
-        X = np.hstack([X_freq, X_counts])
+        #X = np.hstack([X_freq, X_counts])
 
         return model.predict(X)
 
