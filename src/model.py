@@ -77,6 +77,9 @@ def get_frequencies(n_grams, pos_dict):
     
     return freqs
 
+def count_charged_amino_acids(seq):
+    return [seq.count(aa) for aa in ['R', 'H', 'K', 'D', 'E']]
+
 
 class BaselineModel:
     def __init__(self, model_file_path):
@@ -120,10 +123,16 @@ class TreeDecisionOnCharged:
         df_test['charged_sequence'] = df_test['sequence'].apply(lambda seq: [aa2charges[i] for i in seq])
         df_test['charged_3_grams'] = df_test['charged_sequence'].apply(get_n_grams)
         df_test['charged_freqs'] = df_test['charged_3_grams'].apply(lambda x: get_frequencies(x, pos_dict=charged_positions))
+        df_test['charged_count'] = df_test['sequence'].apply(count_charged_amino_acids)
+
+        X_freq = df_test['charged_freqs']
+        X_freq = np.array([row for row in X_freq])
+
+        X_counts = df_test['charged_count'].values
+        X_counts = np.array([row for row in X_counts])
         
-        X = df_test['charged_freqs']
-        X = np.array([row for row in X])
-        
+        X = np.hstack([X_freq, X_counts])
+
         return model.predict(X)
 
 

@@ -14,7 +14,7 @@ with open(args.input_csv) as input_csv:
     df = pd.read_csv(input_csv)
 
 # Run predictions
-y_predictions = TreeDecisionOnCharged(model_file_path='src/DecisionTreeRegressorOnCharged.pickle').predict(df)
+y_predictions = TreeDecisionOnCharged(model_file_path='src/DecisionTreeRegressorOnFilteredChargedExtended.pickle').predict(df)
 
 # Save predictions to file
 df_predictions = pd.DataFrame({'prediction': y_predictions})
