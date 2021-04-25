@@ -432,7 +432,7 @@ class EnsembleTrees:
 
         for i in range(5):
             #model_checkpoint = self.model_file_path + "_" + str(i) + ".pickle"
-            model_checkpoint = self.model_file_path + "_" + 5 + ".pickle"
+            model_checkpoint = self.model_file_path + "_" + 1 + ".pickle"
             with open(model_checkpoint,  'rb') as model_file:
                 model: tree.DecisionTreeRegressor = pickle.load(model_file)
             predictions[i, :] = model.predict(X).flatten()
