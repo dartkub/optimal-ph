@@ -512,12 +512,15 @@ def get_k_mers(seq,k):
         kmers.append(seq[i:i+k])
     return kmers
 
-kmer_dict = None
+
+import json
+with open("./result.json") as fin:
+    kmer_dict = json.load(fin)
 
 class KillerKMer:
 
-    def __init__(self, model_file_path):
-        self.model_file_path = model_file_path
+    def __init__(self):
+        pass
 
     def predict(self, df_test):
         
@@ -526,13 +529,15 @@ class KillerKMer:
         #predictions = [7.0 for i in range(df_test.shape[0])]
         predictions = []
 
+        ph = 0
         for i in df_test.index.values:
             ls_kmers = df_test.loc[i, '5-grams']
             for kmer in ls_kmers:
-                if kmer not in kmer_dict.keys():
+                s_kmer = "".join(kmer)
+                if s_kmer not in kmer_dict.keys():
                     ph += 7.2
-
-                ph += np.mean(kmer_dict[kmer])
+                else:
+                    ph += np.mean(kmer_dict[s_kmer])
 
             ph /= len(ls_kmers)
             predictions.append(ph)
