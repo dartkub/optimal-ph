@@ -70,6 +70,12 @@ aa2charges = {'K':"+",
   
 aa_ls = sorted(one2all.keys())
 
+aa_ls.remove('X')
+aa_ls.remove('Z')
+aa_ls.remove('B')
+aa_ls.remove('J')
+aa_ls.remove('U')
+
 
 def compute_hand_features(seq):
 
@@ -281,7 +287,6 @@ def get_frequencies(n_grams, pos_dict):
 def count_charged_amino_acids(seq):
     return [seq.count(aa) for aa in ['R', 'H', 'K', 'D', 'E']]
 
-
 class BaselineModel:
     def __init__(self, model_file_path):
         self.model_file_path = model_file_path
@@ -353,6 +358,8 @@ class TreeDecisionOnCharged:
 
 def get_X(df_test, features_of_interest):
 
+    #unknown_aa2alanine = {:}
+
     ls_charged_3grams = [p for p in product(sorted(set(aa2charges.values())), repeat=3)]
     charged_positions = {g:i for i, g in enumerate(ls_charged_3grams)}
 
@@ -360,28 +367,48 @@ def get_X(df_test, features_of_interest):
     df_test['charged_3_grams'] = df_test['charged_sequence'].apply(get_n_grams)
     df_test['charged_freqs'] = df_test['charged_3_grams'].apply(lambda x: get_frequencies(x, pos_dict=charged_positions))
     df_test['charged_count'] = df_test['sequence'].apply(count_charged_amino_acids)
+    df_test['sequence'] = df_test['sequence'].apply(lambda x: x.replace("X", "A").replace("Z", "A").replace("B", "A").replace("J", "A").replace("U", "A"))
 
-    df_test['aspF'] = df_test['sequence'].apply(aspDistSeq)
+    aa_ls.remove('X')
+    aa_ls.remove('Z')
+    aa_ls.remove('B')
+    aa_ls.remove('J')
+    aa_ls.remove('U')
+    
+    ls_3grams = [p for p in product(aa_ls, repeat=3)]
+    positions = {g:i for i, g in enumerate(ls_3grams)}
+    df_test['3_grams'] = df_test['sequence'].apply(get_n_grams)
+    df_test['3_grams_freqs'] = df_test['3_grams'].apply(lambda x: get_frequencies(x, pos_dict=positions))
+
+    ls_2grams = [p for p in product(aa_ls, repeat=2)]
+    positions = {g:i for i, g in enumerate(ls_2grams)}
+    df_test['2_grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, 2))
+    df_test['2_grams_freqs'] = df_test['2_grams'].apply(lambda x: get_frequencies(x, pos_dict=positions))
 
     calculate_features(df_test)
 
     n_seq = df_test.shape[0]
-    n_features = 14
+    #n_features = 14
     X_features = np.zeros(shape=(n_seq, n_features))
     for i in range(n_seq):
         fn = os.path.join("./features", "seq"+str(i+1)+".npy")
         data = np.load(fn)
-        X_features[i][:] = data[:n_features]
+        X_features[i][:] = data[:]
+
     X_freq = df_test['charged_freqs']
     X_freq = np.array([row for row in X_freq])
     X_counts = df_test['charged_count'].values
     X_counts = np.array([row for row in X_counts])
     X_asp = df_test['aspF'].values
     X_asp = np.array([row for row in X_asp])
-    
-    X = np.hstack([X_features, X_freq, X_counts, X_asp])
+    X_3grams = df_test['3_grams_freqs']
+    X_3grams = np.array([row for row in X_3grams])
+    X_2grams = df_test['2_grams_freqs']
+    X_2grams = np.array([row for row in X_2grams])
 
-    X[features_of_interest]
+    X = np.hstack([X_asp, X_3grams, X_2grams, X_freq, X_counts, X_features])
+
+    X = X[:, features_of_interest]
 
     return X
     
@@ -415,7 +442,6 @@ class EnsembleTrees:
             fn = os.path.join("./features", "seq"+str(i+1)+".npy")
             data = np.load(fn)
             X_features[i][:] = data[:n_features]
-
 
         X_freq = df_test['charged_freqs']
         X_freq = np.array([row for row in X_freq])
