@@ -351,7 +351,7 @@ class TreeDecisionOnCharged:
 
         return model.predict(X)
 
-def get_X(df_test, ignore_list):
+def get_X(df_test, features_of_interest):
 
     ls_charged_3grams = [p for p in product(sorted(set(aa2charges.values())), repeat=3)]
     charged_positions = {g:i for i, g in enumerate(ls_charged_3grams)}
@@ -380,6 +380,8 @@ def get_X(df_test, ignore_list):
     X_asp = np.array([row for row in X_asp])
     
     X = np.hstack([X_features, X_freq, X_counts, X_asp])
+
+    X[features_of_interest]
 
     return X
     
@@ -429,7 +431,8 @@ class EnsembleTrees:
         predictions = np.empty((5, X.shape[0]))
 
         for i in range(5):
-            model_checkpoint = self.model_file_path + "_" + str(i) + ".pickle"
+            #model_checkpoint = self.model_file_path + "_" + str(i) + ".pickle"
+            model_checkpoint = self.model_file_path + "_" + 5 + ".pickle"
             with open(model_checkpoint,  'rb') as model_file:
                 model: tree.DecisionTreeRegressor = pickle.load(model_file)
             predictions[i, :] = model.predict(X).flatten()
