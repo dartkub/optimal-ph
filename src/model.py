@@ -14,6 +14,7 @@ from sklearn.model_selection import GridSearchCV
 
 from tqdm import tqdm
 from codes import *
+import os
 
 one2all ={    'A': ('A', 'ALA', 'alanine'),
               'R': ('R', 'ARG', 'arginine'),
