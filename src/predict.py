@@ -1,6 +1,6 @@
 import argparse
 import pandas as pd
-from model import TreeDecisionOnCharged,  EnsembleTrees, Killer
+from model import TreeDecisionOnCharged,  EnsembleTrees, Killer, KillerChip
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_csv', default='input.csv')
@@ -15,7 +15,8 @@ with open(args.input_csv) as input_csv:
 
 # Run predictions
 #y_predictions = TreeDecisionOnCharged(model_file_path='src/DecisionTreeRegressorOnFilteredChargedExtended_v2.pickle').predict(df)
-y_predictions =  Killer(model_file_path='src/tree').predict(df)
+#y_predictions =  Killer(model_file_path='src/tree').predict(df)
+y_predictions =  KillerChip().predict(df)
 
 # Save predictions to file
 df_predictions = pd.DataFrame({'prediction': y_predictions})

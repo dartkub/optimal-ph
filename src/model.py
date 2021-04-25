@@ -504,14 +504,67 @@ class Killer:
 
         return predictions
 
-from sklearn.ensemble import ExtraTreesRegressor
+def get_k_mers(seq,k):
+    kmers = []
+    for i in range(len(seq)-k+1):
+        if any(elem in seq[i:i+k] for elem in ["X","B","Z"]):
+            continue
+        kmers.append(seq[i:i+k])
+    return kmers
 
-ExtraTreesRegressor(bootstrap=False, ccp_alpha=0.0, criterion='mse',
-max_depth=None, max_features='auto', max_leaf_nodes=None,
-max_samples=None, min_impurity_decrease=0.0,
-min_impurity_split=None, min_samples_leaf=1,
-min_samples_split=2, min_weight_fraction_leaf=0.0,
-n_estimators=100, n_jobs=-1, oob_score=False,
-random_state=5910, verbose=0, warm_start=False)
+kmer_dict = None
+
+class KillerKMer:
+
+    def __init__(self, model_file_path):
+        self.model_file_path = model_file_path
+
+    def predict(self, df_test):
+        
+        df_test['5-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=5))
+
+        #predictions = [7.0 for i in range(df_test.shape[0])]
+        predictions = []
+
+        for i in df_test.index.values:
+            ls_kmers = df_test.loc[i, '5-grams']
+            for kmer in ls_kmers:
+                if kmer not in kmer_dict.keys():
+                    ph += 7.2
+
+                ph += np.mean(kmer_dict[kmer])
+
+            ph /= len(ls_kmers)
+            predictions.append(ph)
+
+        return predictions
+
+class KillerChip:
+    def __init__(self) -> None:
+        pass
+
+    def predict(self, df_test):
+
+        with open("temp_v00.pickle", 'rb') as model_file:
+            model = pickle.load(model_file)
+
+        df_train = pd.read_csv("./train_set_labels0_sub.csv")
+        y = df_train['mean_growth_PH']
+        
+        X_train = get_X(df_train)
+        X_test = get_X(df_test)
+
+        predictions = [7.0 for i in range(X_test.shape[0])]
+
+        for i in range(X_test.shape[0]):
+            dmin = None
+            ph = model.predict(X_test[i].reshape(1, -1))
+            for j in range(X_train.shape[0]):
+                d = np.linalg.norm(X_test[i][:] - X_train[j][:])
+                if dmin is None or d < dmin:
+                    dmin = d
+                    predictions[i] = 0.9 * y[j] + 0.1*ph
+
+        return predictions
 
 
