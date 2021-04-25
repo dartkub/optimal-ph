@@ -225,6 +225,8 @@ def calculate_features(df, n_features=4263):
     return
 
 def make_fasta(seq, counter):
+    if not os.path.exists("./sequences/"):
+        os.system('mkdir ./sequences/')
     fn_out = "./sequences/seq" + str(counter) + ".fasta"
     f = open(fn_out, "w")
     header = ">sequence" + str(counter) + '\n'
