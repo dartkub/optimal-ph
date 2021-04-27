@@ -474,36 +474,47 @@ class EnsembleTrees:
 
         return predictions
 
-class Killer:
-    def __init__(self, model_file_path):
-        self.model_file_path = model_file_path
+import json
+#with open("./result.json") as fin:
+#    kmer_dict = json.load(fin)
 
+from glob import glob
+
+dicts = glob("dict9_*.json")
+
+kmer_dict = {}
+for dict_file in dicts:
+    with open(dict_file) as fin:
+        new_dict = json.load(fin)
+        kmer_dict = {**kmer_dict, **new_dict}
+
+
+class KillerKMer:
+
+    def __init__(self):
+        pass
 
     def predict(self, df_test):
         
-        df_train = pd.read_csv("./train_set_labels0_sub.csv")
-        y = df_train['mean_growth_PH']
-        #X_train = get_X(df_train)
-        # X = np.load("/home/markzaretckii/Desktop/bhp/optimal-ph/data/sequence_features.npy")
-        # y = X['ph']
-        # X_train = np.hstack([X['aspF'].reshape(-1, 1), X['3_grams'], X['2_grams'], X['charged_3_grams'], X['charges_count'], X['features']])
-        # X_train = X[:, -4235:-]
-        
-        X_train = get_X(df_train)
-        X_test = get_X(df_test)
+        df_test['9-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=9))
 
-        predictions = [7.0 for i in range(X_test.shape[0])]
+        #predictions = [7.0 for i in range(df_test.shape[0])]
+        predictions = []
 
-        for i in range(X_test.shape[0]):
-            dmin = None
-            for j in range(X_train.shape[0]):
-                d = np.linalg.norm(X_test[i][:] - X_train[j][:])
-                if dmin is None or d < dmin:
-                    dmin = d
-                    predictions[i] = y[j]
+        ph = 0
+        for i in df_test.index.values:
+            ls_kmers = df_test.loc[i, '9-grams']
+            for kmer in ls_kmers:
+                s_kmer = "".join(kmer)
+                if s_kmer not in kmer_dict.keys():
+                    ph += 7.2
+                else:
+                    ph += np.mean(kmer_dict[s_kmer])
+
+            ph /= len(ls_kmers)
+            predictions.append(ph)
 
         return predictions
-
 
 class KillerChip:
     def __init__(self) -> None:
