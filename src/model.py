@@ -507,7 +507,7 @@ class KillerKMer:
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
                 if s_kmer not in kmer_dict.keys():
-                    ph += 7.2
+                    ph += 7.0#7.2
                 else:
                     ph += np.mean(kmer_dict[s_kmer])
 
