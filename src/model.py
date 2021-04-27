@@ -507,7 +507,7 @@ class KillerKMer:
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
                 if s_kmer not in kmer_dict.keys():
-                    ph += 7.0#initially was 7.2, but  7.0 works the best
+                    ph += 7.0 #empirical constant from fast DFT calculations
                 else:
                     ph += np.mean(kmer_dict[s_kmer])
 
