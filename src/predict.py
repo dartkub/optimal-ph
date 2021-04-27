@@ -1,6 +1,6 @@
 import argparse
 import pandas as pd
-from model import TreeDecisionOnCharged,  EnsembleTrees, Killer, KillerChip, KillerKMer
+from model import KillerKMer
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input_csv', default='input.csv')
