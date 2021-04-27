@@ -475,18 +475,18 @@ class EnsembleTrees:
         return predictions
 
 import json
-#with open("./result.json") as fin:
-#    kmer_dict = json.load(fin)
+with open("./result.json") as fin:
+    kmer_dict = json.load(fin)
 
 from glob import glob
 
-dicts = glob("dict9_*.json")
+#dicts = glob("dict9_*.json")
 
-kmer_dict = {}
-for dict_file in dicts:
-    with open(dict_file) as fin:
-        new_dict = json.load(fin)
-        kmer_dict = {**kmer_dict, **new_dict}
+#kmer_dict = {}
+#for dict_file in dicts:
+#    with open(dict_file) as fin:
+#        new_dict = json.load(fin)
+#        kmer_dict = {**kmer_dict, **new_dict}
 
 
 class KillerKMer:
@@ -496,18 +496,18 @@ class KillerKMer:
 
     def predict(self, df_test):
         
-        df_test['9-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=9))
+        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=5))
 
         #predictions = [7.0 for i in range(df_test.shape[0])]
         predictions = []
 
         ph = 0
         for i in df_test.index.values:
-            ls_kmers = df_test.loc[i, '9-grams']
+            ls_kmers = df_test.loc[i, 'n-grams']
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
                 if s_kmer not in kmer_dict.keys():
-                    ph += 7.1#7.2
+                    ph += 7.0#initially was 7.2, but  7.0 works the best
                 else:
                     ph += np.mean(kmer_dict[s_kmer])
 
