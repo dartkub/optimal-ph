@@ -507,7 +507,7 @@ class KillerKMer:
             ls_kmers = df_test.loc[i, 'n-grams']
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
-                aa_s_of_interest = {'K', 'H', 'D', 'E'} #'R'
+                aa_s_of_interest = {'K', 'H', 'D', 'E', 'R'}
                 
                 if aa_s_of_interest.intersection(s_kmer):
                     if s_kmer in kmer_dict.keys():
