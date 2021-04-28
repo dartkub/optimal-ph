@@ -475,18 +475,19 @@ class EnsembleTrees:
         return predictions
 
 import json
-with open("./result.json") as fin:
-    kmer_dict = json.load(fin)
-
 from glob import glob
 
-#dicts = glob("dict9_*.json")
+# with open("./result.json") as fin:
+#     kmer_dict = json.load(fin)
 
-#kmer_dict = {}
-#for dict_file in dicts:
-#    with open(dict_file) as fin:
-#        new_dict = json.load(fin)
-#        kmer_dict = {**kmer_dict, **new_dict}
+
+dicts = glob("dict9_*.json")
+
+kmer_dict = {}
+for dict_file in dicts:
+   with open(dict_file) as fin:
+       new_dict = json.load(fin)
+       kmer_dict = {**kmer_dict, **new_dict}
 
 
 class KillerKMer:
@@ -496,7 +497,7 @@ class KillerKMer:
 
     def predict(self, df_test):
         
-        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=5))
+        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=9))
 
         #predictions = [7.0 for i in range(df_test.shape[0])]
         predictions = []
@@ -506,10 +507,17 @@ class KillerKMer:
             ls_kmers = df_test.loc[i, 'n-grams']
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
-                if s_kmer not in kmer_dict.keys():
-                    ph += 7.0 #empirical constant from fast DFT calculations
+                aa_s_of_interest = {'K', 'H', 'D', 'E'} #'R'
+                
+                if aa_s_of_interest.intersection(s_kmer):
+                    if s_kmer in kmer_dict.keys():
+                        ph += np.mean(kmer_dict[s_kmer])
+                    else:
+                        ph += 7.0
+                # if s_kmer not in kmer_dict.keys():
+                #     ph += 7.0 #empirical constant from fast DFT calculations
                 else:
-                    ph += np.mean(kmer_dict[s_kmer])
+                    ph += 7.0 #np.mean(kmer_dict[s_kmer])
 
             ph /= len(ls_kmers)
             predictions.append(ph)
