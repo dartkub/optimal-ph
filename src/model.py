@@ -481,7 +481,7 @@ from glob import glob
 #     kmer_dict = json.load(fin)
 
 
-dicts = glob("dict9_*.json")
+dicts = glob("dict11_*.json")
 
 kmer_dict = {}
 for dict_file in dicts:
@@ -507,17 +507,17 @@ class KillerKMer:
             ls_kmers = df_test.loc[i, 'n-grams']
             for kmer in ls_kmers:
                 s_kmer = "".join(kmer)
-                aa_s_of_interest = {'K', 'H', 'D', 'E', 'R'}
+                # aa_s_of_interest = {'K', 'H', 'D', 'E', 'R'}
                 
-                if aa_s_of_interest.intersection(s_kmer):
-                    if s_kmer in kmer_dict.keys():
-                        ph += np.mean(kmer_dict[s_kmer])
-                    else:
-                        ph += 7.0
-                # if s_kmer not in kmer_dict.keys():
-                #     ph += 7.0 #empirical constant from fast DFT calculations
+                # if aa_s_of_interest.intersection(s_kmer):
+                #     if s_kmer in kmer_dict.keys():
+                #         ph += np.mean(kmer_dict[s_kmer])
+                #     else:
+                #         ph += 7.0
+                if s_kmer not in kmer_dict.keys():
+                    ph += 7.0 #empirical constant from some fast DFT calculations
                 else:
-                    ph += 7.0 #np.mean(kmer_dict[s_kmer])
+                    ph += np.mean(kmer_dict[s_kmer])
 
             ph /= len(ls_kmers)
             predictions.append(ph)
