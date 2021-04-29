@@ -481,7 +481,7 @@ from glob import glob
 #     kmer_dict = json.load(fin)
 
 
-dicts = glob("dict11_*.json")
+dicts = glob("dict10_*.json")
 
 kmer_dict = {}
 for dict_file in dicts:
@@ -497,7 +497,7 @@ class KillerKMer:
 
     def predict(self, df_test):
         
-        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=11))
+        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=10))
 
         #predictions = [7.0 for i in range(df_test.shape[0])]
         predictions = []
