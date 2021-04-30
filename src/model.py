@@ -482,7 +482,7 @@ from glob import glob
 
 
 
-dicts = glob("dict8_*.json")
+dicts = glob("dict6_*.json")
 kmer_dict = {}
 for dict_file in dicts:
    with open(dict_file) as fin:
@@ -490,12 +490,12 @@ for dict_file in dicts:
        kmer_dict = {**kmer_dict, **new_dict}
 
 
-dicts = glob("charged_dict8_*.json")
-charged_kmer_dict = {}
-for dict_file in dicts:
-   with open(dict_file) as fin:
-       new_dict = json.load(fin)
-       charged_kmer_dict = {**charged_kmer_dict, **new_dict}
+# dicts = glob("charged_dict8_*.json")
+# charged_kmer_dict = {}
+# for dict_file in dicts:
+#    with open(dict_file) as fin:
+#        new_dict = json.load(fin)
+#        charged_kmer_dict = {**charged_kmer_dict, **new_dict}
 
 
 class KillerKMer:
@@ -505,7 +505,7 @@ class KillerKMer:
 
     def predict(self, df_test):
         
-        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=8))
+        df_test['n-grams'] = df_test['sequence'].apply(lambda x: get_n_grams(x, n=6))
 
         #predictions = [7.0 for i in range(df_test.shape[0])]
         predictions = []
@@ -523,11 +523,11 @@ class KillerKMer:
                 #     else:
                 #         ph += 7.0
                 if s_kmer not in kmer_dict.keys():
-                    charged_kmer = "".join([aa2charges[i] for i in s_kmer])
-                    if charged_kmer in charged_kmer_dict.keys():
-                        ph += charged_kmer_dict[charged_kmer]
-                    else:
-                        ph += 7.0 #empirical constant from some fast DFT calculations
+                    # charged_kmer = "".join([aa2charges[i] for i in s_kmer])
+                    # if charged_kmer in charged_kmer_dict.keys():
+                    #     ph += charged_kmer_dict[charged_kmer]
+                    # else:
+                    ph += 7.0 #empirical constant from some fast DFT calculations
                 else:
                     ph += np.mean(kmer_dict[s_kmer])
 
